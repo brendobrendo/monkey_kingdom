@@ -37,8 +37,11 @@ Simulation Snapshot:
 ### 4. **Development Considerations**
 - **Tech Stack**:
   - **Web-Based UI**: React + D3.js for visualization.
-  - **Backend Simulation**: Python (Flask) or Node.js (Express).
-  - **Data Storage**: JSON or lightweight database.
+  - **Backend Simulation**: Python (Flask).
+  - **Data Storage**:
+  - **MongoDB**: Stores **game state, territory details, and event logs** in a flexible, document-based format.
+  - **Neo4j**: Manages **monkey relationships, social dynamics, and power structures**, enabling efficient graph-based queries.
+  - **PostgreSQL**: Introduced later for **structured economic/resource systems**, ensuring transactional consistency as the game expands.
 - **Performance Optimizations**:
   - No complex animations or rendering of individual agents.
   - Dashboard updates periodically based on simulation state.
