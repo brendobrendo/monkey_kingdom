@@ -1,7 +1,7 @@
 # Monkey Social Simulation Game
 
 ## Overview
-This project is a **high-level simulation game** that models how **monkeys develop social capital, gain access to resources, and navigate intra- and inter-tribal dynamics**. Instead of direct interactivity, the game provides **a structured dashboard with exportable data** for analysis and storytelling.
+This project is a **high-level simulation game** that models how **monkeys develop social capital, gain access to resources, and navigate intra- and inter-tribal dynamics**.
 
 ## Core Features
 
@@ -16,12 +16,12 @@ Players interact with the game through a **dashboard-based interface**, which pr
 - **Simulation Logic**: Focused on **lightweight CPU performance**, avoiding GPU-intensive operations.
 
 ### 2. **Game UI & Visualization**
-The game features a **dashboard-based interface**, focusing on **high-level data visualization** rather than real-time rendering of individual agents. The **primary visual component** is a **Risk-style 2D map**, which serves as the central way to track **territory control, population distribution, and key game events**. This is supported by a **structured dashboard** that provides insights into simulation metrics and allows for exporting game state data for further analysis or storytelling.
+The **primary visual component** is a **Risk-style 2D map**, which serves as the central way to track **territory control, population distribution, and key game events**. This is supported by a **structured dashboard** that provides insights into simulation metrics and allows for exporting game state data for further analysis or storytelling.
 
 ---
 
 ### **Map Design & Representation**
-The map is divided into **major territories**, each containing **distinct sub-territories** labeled for reference (e.g., *Western Plains*, *Tallgrass Valley*). **Only one tribe can occupy a territory at a time**, with the controlling tribe’s **color** visually marking ownership (e.g., 🔴 Firefangs, 🔵 Shadow Claws). Each territory displays a **numeric token** representing the **number of monkeys present**, similar to army stacks in *Risk*, dynamically updating as populations **migrate, battle, or reproduce**.
+The map is divided into **major territories**, each containing **distinct sub-territories** labeled for reference (e.g., *Western Plains*, *Tallgrass Valley*). **Only one tribe can occupy a territory at a time**, with the controlling tribe’s **color** visually marking ownership (e.g., 🔴 Firefangs, 🔵 Shadow Claws). Each territory displays a **numeric token** representing the **number of monkeys present**, similar to army stacks in *Risk*, dynamically updating as the board state changes after each turn/iteration.
 
 #### **Territory Visualization**
 - **Color-Coded Control System**:
@@ -32,7 +32,6 @@ The map is divided into **major territories**, each containing **distinct sub-te
 - **Overlay Icons for Key States**:
   - ⚔️ **Active Conflict** – A battle is ongoing in this region.  
   - 🍌 **Resource Abundance** – High food and water availability.  
-  - ⏳ **Pending Migration** – A significant population shift is about to occur.  
 
 ---
 
@@ -47,7 +46,7 @@ A **top-level overview** that condenses **key statistics** into a readable, glan
 - 🍌 **Resource Availability** – Overall food & water abundance.  
 - ⚔️ **Conflict Level** – Heatmap indicator (low to high).  
 - 🔄 **Recent Major Events** – Summary of significant changes (e.g., "A power struggle occurred in the Eastern Jungle").  
-- ⏳ **Simulation Time** – Number of days/weeks in-game.  
+- ⏳ **Simulation Time** – Number of days in-game.  
 
 #### **B. Interactive Panels & Territory Data**
 Players can drill down into **specific territories** and **monkey profiles** using detailed panels:
@@ -56,8 +55,8 @@ Players can drill down into **specific territories** and **monkey profiles** usi
 Clicking on a **territory** opens a structured breakdown of:
 - **Current Owner** – Which tribe controls the territory.  
 - **Population Count** – Total number of monkeys present.  
-- **Resource Levels** – Bananas, water, and shelter availability.  
-- **Recent Events** – Leadership changes, battles, or major migrations.  
+- **Resource Levels** – Fruit and other resource availability.  
+- **Recent Events** – Leadership changes, battles, or major population changes.  
 - **Territory Relationships** – Allies, rivalries, and power struggles.  
 📋 **Copy Territory Data**: Allows for export of territory-specific details.
 
@@ -67,7 +66,6 @@ Selecting a **monkey profile** provides granular details:
 - **Social Rank** – Alpha, Beta, subordinate, or outcast.  
 - **Allies & Rivals** – List of connected relationships.  
 - **Recent Actions** – Battles fought, leadership changes, or betrayals.  
-- **Current Needs** – Hunger, safety, or group acceptance.  
 📋 **Copy Monkey Data**: Exports the full profile for deeper storytelling.
 
 ---
@@ -84,7 +82,7 @@ The dashboard integrates **export options** for easy data retrieval:
 ### **Why This Approach?**
 ✅ **Efficient, High-Level Overview** – Quick interpretation of **tribal dominance and population shifts**.  
 ✅ **Drill-Down Data Access** – Allows exploration of **territory-specific and individual monkey details**.  
-✅ **ChatGPT-Compatible Exporting** – Facilitates **easy copy-paste** for storytelling and AI-generated analysis.  
+✅ **ChatGPT-Compatible Exporting** – Facilitates **easy copy-paste** to generate storytelling and data analysis.  
 ✅ **Lightweight & AI-Driven** – Designed for **smooth simulation updates** without requiring heavy real-time rendering.  
 
 ---
@@ -110,7 +108,7 @@ Simulation Snapshot:
 ### 4. Core Mechanics
 
 #### 1. Data Export Format  
-- All game state exports, including monkey profiles, tribal events, and simulation snapshots, will be in **YAML format** for readability and structured analysis.
+- All game state exports, including monkey profiles, tribal events, and simulation snapshots, will be in **YAML format** for readability and structured analysis by ChatGPT when it is copy and pasted.
 
 #### 2. Territorial Battles  
 - Battles will function similarly to **Risk**, using a probabilistic system where larger armies have a higher chance of success.  
@@ -127,6 +125,7 @@ Simulation Snapshot:
 #### 5. Resource System  
 - The only tracked resource will be **food (fruit)**, which serves both as sustenance and a decaying asset.  
 - Monkeys consume food for energy, but unconsumed food will **expire over time**, affecting long-term sustainability.
+- The fruit grows on trees which have their own properties (ie current size, size potential, growth rate, replenishment of fruit and leaves) based on the type of tree
 
 #### 6. Learning & Memory  
 - Monkeys will **remember past betrayals and alliances**, influencing their future decisions.  
