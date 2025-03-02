@@ -12,19 +12,28 @@ This project is a **high-level simulation game** that models how **monkeys devel
 - **Simulation Logic**: Focused on **lightweight CPU performance**, avoiding GPU-intensive operations.
 
 ### 2. **Game UI & Visualization**
-- **Dashboard-Based Interface** (No real-time rendering of individual agents).
-- **Risk-Style 2D Map**:
-  - Territories represented as **colored regions**.
-  - Icons overlay to indicate key states (**dominance, conflict, resource levels**).
-  - **Color Coding**: Green (resource-rich), Yellow (balanced), Red (conflict), Grey (unoccupied).
-  ## **Map Design & Representation**
+The game features a **dashboard-based interface**, focusing on high-level data visualization rather than real-time rendering of individual agents. The primary visual component is a **Risk-style 2D map**, which serves as the central way to track **territory control, population distribution, and key game events**.
 
-The game map follows a **Risk-style** design, divided into **major territories** with distinct **sub-territories**, each labeled for reference (e.g., "Western Plains," "Tallgrass Valley"). **Only one tribe can occupy a territory at a time**, with control visually represented by the tribe's **color** (e.g., red for the Firefangs, blue for the Shadow Claws). Within each territory, a **numeric piece/token** displays the **number of monkeys present**, similar to army stacks in Risk, dynamically updating as monkeys migrate, battle, or reproduce. 
+#### **Map Design & Representation**
+The map is divided into **major territories**, each containing **distinct sub-territories** labeled for reference (e.g., *Western Plains*, *Tallgrass Valley*). **Only one tribe can occupy a territory at a time**, with the controlling tribe’s **color** visually marking ownership (e.g., 🔴 Firefangs, 🔵 Shadow Claws). Each territory displays a **numeric token** representing the **number of monkeys present**, similar to army stacks in *Risk*, dynamically updating as populations **migrate, battle, or reproduce**.
 
-**Icons provide quick insights** into each region’s status, such as ⚔️ for active conflict, 🍌 for resource abundance, or ⏳ for pending migrations. Monkeys can **move into adjacent unoccupied territories** or **attack enemy-held regions**, with **combat resolving control**—the winner **claims the land**, and the losing tribe is displaced. The **map updates instantly** to reflect new ownership. Movement is constrained by **natural barriers** (e.g., rivers, mountains), shaping strategic decisions. 
+#### **Territory Visualization**
+- **Color-Coded Control System**:
+  - 🟢 **Green** – Resource-rich region.  
+  - 🟡 **Yellow** – Balanced conditions.  
+  - 🔴 **Red** – Conflict zone.  
+  - ⚫ **Grey** – Unoccupied territory.  
+- **Overlay Icons for Key States**:
+  - ⚔️ **Active Conflict** – A battle is ongoing in this region.  
+  - 🍌 **Resource Abundance** – High food and water availability.  
+  - ⏳ **Pending Migration** – A significant population shift is about to occur.  
 
-This **simple, data-driven board** allows players to quickly **interpret tribal dominance, population shifts, and strategic positioning**, making it highly **compatible with AI-driven simulations and exportable game state data for storytelling**.
+#### **Movement & Combat Mechanics**
+- Monkeys **move into adjacent unoccupied territories** or **engage in combat** when entering enemy-occupied regions.  
+- **Combat determines new ownership**—the winner claims the territory, and the losing tribe is either displaced or eliminated.  
+- **Movement constraints** exist based on **natural barriers** (e.g., rivers, mountains, dense forests), influencing strategic decisions.  
 
+This **simplified, data-driven board** enables players to **quickly interpret tribal dominance, population shifts, and strategic positioning** while remaining **lightweight and AI-driven**, ensuring smooth **simulation exports for storytelling purposes**.
 
 ### 3. **Data-Driven Gameplay (Copy-Paste Export for Storytelling)**
 - **Game State Summary** (Snapshot of entire simulation).
