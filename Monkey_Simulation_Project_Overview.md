@@ -17,6 +17,14 @@ This project is a **high-level simulation game** that models how **monkeys devel
   - Territories represented as **colored regions**.
   - Icons overlay to indicate key states (**dominance, conflict, resource levels**).
   - **Color Coding**: Green (resource-rich), Yellow (balanced), Red (conflict), Grey (unoccupied).
+  ## **Map Design & Representation**
+
+The game map follows a **Risk-style** design, divided into **major territories** with distinct **sub-territories**, each labeled for reference (e.g., "Western Plains," "Tallgrass Valley"). **Only one tribe can occupy a territory at a time**, with control visually represented by the tribe's **color** (e.g., red for the Firefangs, blue for the Shadow Claws). Within each territory, a **numeric piece/token** displays the **number of monkeys present**, similar to army stacks in Risk, dynamically updating as monkeys migrate, battle, or reproduce. 
+
+**Icons provide quick insights** into each region’s status, such as ⚔️ for active conflict, 🍌 for resource abundance, or ⏳ for pending migrations. Monkeys can **move into adjacent unoccupied territories** or **attack enemy-held regions**, with **combat resolving control**—the winner **claims the land**, and the losing tribe is displaced. The **map updates instantly** to reflect new ownership. Movement is constrained by **natural barriers** (e.g., rivers, mountains), shaping strategic decisions. 
+
+This **simple, data-driven board** allows players to quickly **interpret tribal dominance, population shifts, and strategic positioning**, making it highly **compatible with AI-driven simulations and exportable game state data for storytelling**.
+
 
 ### 3. **Data-Driven Gameplay (Copy-Paste Export for Storytelling)**
 - **Game State Summary** (Snapshot of entire simulation).
