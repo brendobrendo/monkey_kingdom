@@ -29,7 +29,7 @@ To create **realistic and evolving monkey behavior**, the AI model will incorpor
 
 The monkey receives **rewards or penalties** based on the outcome of its actions:
 
-\[
+$$
 R(s, a, s') =
 \begin{cases} 
 +10, & \text{if the action increases rank or reproductive success} \\
@@ -38,7 +38,8 @@ R(s, a, s') =
 -10, & \text{if the action causes injury or exile} \\
 -20, & \text{if the action leads to death}
 \end{cases}
-\]
+$$
 
 This reward function ensures that behaviors aligned with **survival and reproduction** are reinforced over time. 
+
 
