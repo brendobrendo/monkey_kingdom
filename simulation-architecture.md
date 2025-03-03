@@ -42,4 +42,22 @@ $$
 
 This reward function ensures that behaviors aligned with **survival and reproduction** are reinforced over time. 
 
+# Self-Attention in Transformers: How K, Q, and V Modify an Embedding Token Vector
 
+In a **Transformer model**, each token in a sequence is **embedded** as a vector and modified by the **self-attention mechanism**, where three key matrices—**Key (K), Query (Q), and Value (V)**—determine how information is shared between tokens.
+
+## **1️⃣ Token Embedding Vector**
+Each token (word) in a sentence is first mapped to an **embedding vector**:
+
+$$
+X_i = \text{Embedding}(\text{Token}_i) \in \mathbb{R}^{d}
+$$
+
+where:
+- \( X_i \) is the **embedding vector** of the token.
+- \( d \) is the **embedding dimension**.
+
+For example, if we have the token **"monkey"**, its embedding might look like:
+
+```python
+X_monkey = [0.12, -0.34, 0.56, ..., 0.89]  # 512-dimensional vector
