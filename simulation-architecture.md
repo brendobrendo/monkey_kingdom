@@ -24,3 +24,21 @@ To create **realistic and evolving monkey behavior**, the AI model will incorpor
 - **Peer Instinct** - Monkeys will adapt their behavior based on the actions of their peers, following group norms to maintain social cohesion.
 - **Hero Instinct** - Certain monkeys may strive to emulate high-status individuals, adopting their strategies and behaviors to climb the social hierarchy.
 - **Ancestor Instinct** - Traditional behaviors and past strategies may be passed down, with younger monkeys mimicking and inheriting the habits of previous generations.
+
+## Reward Function
+
+The monkey receives **rewards or penalties** based on the outcome of its actions:
+
+\[
+R(s, a, s') =
+\begin{cases} 
++10, & \text{if the action increases rank or reproductive success} \\
++5, & \text{if the action secures food, water, or protection} \\
+-5, & \text{if the action results in temporary social rejection} \\
+-10, & \text{if the action causes injury or exile} \\
+-20, & \text{if the action leads to death}
+\end{cases}
+\]
+
+This reward function ensures that behaviors aligned with **survival and reproduction** are reinforced over time. 
+
