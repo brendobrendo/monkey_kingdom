@@ -2,15 +2,7 @@
 
 ### **Social & Political Dynamics**  
 - **Coordinated Defections** – Groups of monkeys within a tribe may **choose to defect together**, forming a new faction.  
-- **Power Struggles & Coups** – Monkeys can **attempt to overthrow the alpha** or **eliminate rival factions** within their tribe.  
-
-### **Resource Management & Environmental Constraints**  
-- **Diverse Resource Types** – The world will contain multiple resource types:  
-  - 🍌 **Food (Bananas)** – The **only food source for now**. Grows on trees and is essential for survival.  
-  - 🌳 **Trees** – Provide both **bananas** and **wood**, enabling monkeys to gather food and construct tools or shelters.  
-  - 🪵 **Wood** – Usable for **nest-building, crafting tools, or making defensive structures**.  
-  - 🪨 **Stone** – Can be used to create **tools, weapons, and machines**.  
-  - 💧 **Water** – Essential for survival; monkeys must remain close to a source to drink.  
+- **Power Struggles & Coups** – Monkeys can **attempt to overthrow the alpha** or **eliminate rival factions** within their tribe.    
 
 ### **Individual Monkey AI & Decision-Making Model**  
 - Each monkey has an **internal AI model** that determines its actions based on:  
@@ -27,3 +19,8 @@ To create **realistic and evolving monkey behavior**, the AI model will incorpor
 - **Reinforcement Learning** – They can learn new behaviors through trial and error.  
 - **Vicarious Learning** – Monkeys can imagine alternative outcomes to inform future decisions.  
 - **Mentalization (Theory of Mind)** – They can predict **other monkeys' intentions** based on past behavior.  
+
+### **Tribal Instincts**
+- **Peer Instinct** - Monkeys will adapt their behavior based on the actions of their peers, following group norms to maintain social cohesion.
+- **Hero Instinct** - Certain monkeys may strive to emulate high-status individuals, adopting their strategies and behaviors to climb the social hierarchy.
+- **Ancestor Instinct** - Traditional behaviors and past strategies may be passed down, with younger monkeys mimicking and inheriting the habits of previous generations.
