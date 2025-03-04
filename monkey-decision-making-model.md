@@ -62,6 +62,7 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 - 🤝 **Request Allyship** – Attempt to form an alliance.
     - 🍼 **Nurture** – Take care of offspring or close allies.
     - 🧼 **Groom** – Strengthen bonds by grooming another monkey.
+    - 🍽 **Share Food** – Offer food to build trust and gain allies.
 - ✅ **Accept Allyship** – Strengthen social bonds with a trusted monkey.
 - ❌ **Betray** – Backstab an ally for personal gain.
 - 🔁 **Remember Betrayal** – Store memory of past betrayals.
@@ -69,7 +70,6 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 ### **Survival Actions**
 - 💧 **Get Water** – Seek hydration from the nearest source.
 - 🍌 **Eat** – Consume food to restore nourishment.
-- 🍽 **Share Food** – Offer food to build trust and gain allies.
 
 ---
 
