@@ -190,3 +190,94 @@ Would you like:
 3. **A state machine diagram** to visualize decision pathways?  
 
 Let me know how you'd like to proceed! 🚀🐵
+
+# Implementing Q-Learning in the Monkey Decision-Making Model
+
+**Q-Learning** is a reinforcement learning algorithm that enables the monkey to **learn from experience** by adjusting its behavior over time based on **rewards** for actions. This approach improves decision-making by **learning optimal action policies** rather than relying on predefined utility estimates.
+
+## **Why Use Q-Learning?**
+✅ **Learns from trial and error** instead of using arbitrary utility values.  
+✅ **Adjusts strategy over time** to maximize long-term survival and reproduction.  
+✅ **Improves adaptability** to different environments (e.g., resource-rich vs. dangerous settings).  
+✅ **Balances exploration and exploitation** (trying new actions vs. repeating high-reward actions).  
+
+```python
+import numpy as np
+import random
+
+# Define hyperparameters
+alpha = 0.1  # Learning rate
+gamma = 0.9  # Discount factor
+epsilon = 0.1  # Exploration rate
+
+# Define state and action spaces
+state_size = 5 + 15 + 6  # Physical state + beliefs + behavioral values
+action_space = ["Fight", "Submit", "Request Allyship", "Groom", "Eat", "Get Water"]
+num_actions = len(action_space)
+
+# Initialize Q-table (state-action values)
+Q_table = np.zeros((1000, num_actions))  # Assume 1000 possible states for simplicity
+
+# Define a function to convert a monkey's state into an index (for Q-table lookup)
+def get_state_index(state):
+    return hash(tuple(state)) % 1000  # Hash state and map to table index
+
+# Define reward function
+def get_reward(action, state):
+    strength, restedness, nourishment, hydration, temperature = state[:5]  # Extract physical state
+
+    if action == "Fight":
+        return 1 if strength > 0.7 else -1  # Reward fighting if strong, penalize if weak
+    elif action == "Eat":
+        return 1 if nourishment < 0.3 else -0.5  # Reward eating when hungry
+    elif action == "Get Water":
+        return 1 if hydration < 0.3 else -0.5  # Reward drinking when thirsty
+    elif action == "Groom":
+        return 0.5  # Social bonding provides a small reward
+    elif action == "Request Allyship":
+        return 0.3 if strength < 0.5 else -0.2  # Reward weak monkeys for seeking allies
+    elif action == "Submit":
+        return 0.2 if strength < 0.4 else -0.3  # Weak monkeys should submit, strong ones shouldn't
+
+    return 0  # Default reward for unlisted actions
+
+# Q-Learning training loop
+num_episodes = 10000
+
+for episode in range(num_episodes):
+    # Generate a random state (simulating different monkey conditions)
+    state = np.random.rand(state_size)  # Normalize between 0 and 1
+    state_index = get_state_index(state)
+
+    # Choose action using ε-greedy policy
+    if random.uniform(0, 1) < epsilon:
+        action_index = np.random.randint(num_actions)  # Explore random action
+    else:
+        action_index = np.argmax(Q_table[state_index])  # Exploit best action
+
+    action = action_space[action_index]
+
+    # Get reward and next state
+    reward = get_reward(action, state)
+    next_state = np.random.rand(state_size)  # Simulate next state after action
+    next_state_index = get_state_index(next_state)
+
+    # Q-value update using Bellman equation
+    best_future_q = np.max(Q_table[next_state_index])  # Max Q-value from next state
+    Q_table[state_index, action_index] += alpha * (reward + gamma * best_future_q - Q_table[state_index, action_index])
+
+    # Print progress every 1000 episodes
+    if episode % 1000 == 0:
+        print(f"Episode {episode}, State Index: {state_index}, Action: {action}, Reward: {reward}")
+
+# Decision function
+def choose_best_action(state):
+    state_index = get_state_index(state)
+    best_action_index = np.argmax(Q_table[state_index])
+    return action_space[best_action_index]
+
+# Example decision-making
+test_state = np.random.rand(state_size)  # Random monkey state
+best_action = choose_best_action(test_state)
+print(f"Best Action for Test State: {best_action}")
+```
