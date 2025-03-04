@@ -73,6 +73,109 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 
 ---
 
+## **Example Implementation**
+```
+python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+
+# Define the Neural Network Model
+class MonkeyDecisionNet(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MonkeyDecisionNet, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)  # First hidden layer
+        self.fc2 = nn.Linear(hidden_size, hidden_size) # Second hidden layer
+        self.fc3 = nn.Linear(hidden_size, output_size) # Output layer
+        self.activation = nn.ReLU()  # Activation function for hidden layers
+
+    def forward(self, x):
+        x = self.activation(self.fc1(x))
+        x = self.activation(self.fc2(x))
+        x = self.fc3(x)  # No activation on output layer (raw utility scores)
+        return x
+
+# Define Monkey Inputs
+physical_state = [
+    "Strength/Weight", "Restedness", "Nourishment", "Hydration Level", "Internal Temperature"
+]
+
+beliefs = [
+    "Self-Reliance", "Combat Prowess", "Attractiveness", "Cunning", "Resilience", "Curiosity",
+    "Strength Hierarchy", "Social Status", "Trustworthiness",
+    "Social Rank", "Personal Likeability",
+    "Safety Assessment", "Resource Availability", "Environmental Dangers", "Geographical Awareness"
+]
+
+behavioral_values = ["Certainty", "Variety", "Significance", "Connection", "Growth", "Contribution"]
+
+actions = [
+    "Fight", "Submit", "Request Allyship", "Nurture", "Groom", "Share Food", 
+    "Accept Allyship", "Betray", "Remember Betrayal", "Get Water", "Eat"
+]
+
+# Set input size, hidden size, and output size
+input_size = len(physical_state) + len(beliefs) + len(behavioral_values)
+hidden_size = 32  # Can be tuned
+output_size = len(actions)
+
+# Instantiate model
+model = MonkeyDecisionNet(input_size, hidden_size, output_size)
+
+# Define loss function and optimizer
+criterion = nn.MSELoss()  # Mean Squared Error for utility prediction
+optimizer = optim.Adam(model.parameters(), lr=0.01)  # Adam optimizer
+
+# Generate Sample Data (Simulated)
+def generate_sample():
+    # Random values between 0 and 1 for input features
+    input_tensor = torch.tensor(np.random.rand(input_size), dtype=torch.float32)
+    
+    # Simulate a target utility score for each action (random for now)
+    target_tensor = torch.tensor(np.random.rand(output_size), dtype=torch.float32)
+
+    return input_tensor, target_tensor
+
+# Training Loop
+num_epochs = 500
+for epoch in range(num_epochs):
+    optimizer.zero_grad()
+
+    # Generate training data
+    input_tensor, target_tensor = generate_sample()
+    
+    # Forward pass
+    output = model(input_tensor)
+    
+    # Compute loss
+    loss = criterion(output, target_tensor)
+    
+    # Backpropagation
+    loss.backward()
+    optimizer.step()
+    
+    if epoch % 50 == 0:
+        print(f"Epoch [{epoch}/{num_epochs}], Loss: {loss.item():.4f}")
+
+# Decision Function
+def choose_action(state):
+    """
+    Given a state (physical state, beliefs, behavioral values),
+    predict the best action based on learned utility scores.
+    """
+    state_tensor = torch.tensor(state, dtype=torch.float32)
+    with torch.no_grad():
+        action_utilities = model(state_tensor)
+    best_action_idx = torch.argmax(action_utilities).item()
+    return actions[best_action_idx], action_utilities.numpy()
+
+# Example Decision
+test_state = np.random.rand(input_size)  # Random monkey state
+best_action, utilities = choose_action(test_state)
+print(f"Best Action: {best_action}")
+```
+
 ## **📌 Summary**
 - Monkeys make **decisions** based on their **physical state, beliefs, and core needs**.
 - **Survival & reproduction** drive all actions.
