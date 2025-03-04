@@ -7,10 +7,10 @@ At the most fundamental level, a monkey's **decisions are driven by its need to 
 Each monkey maintains an **internal physical state** that influences its capabilities and decision-making:
 
 ### **Physical State Variables**
-- **Strength/Weight** – Determines combat effectiveness and dominance.
-- **Restedness** – Affects energy levels and ability to engage in long-term activities.
-- **Nourishment** – Hunger level, influencing food-seeking behaviors.
-- **Hydration Level** – Water needs, driving the search for nearby water sources.
+- **Strength/Weight** – Represents both the monkey’s physical **size and muscular capability**. A heavier monkey is also a stronger monkey, simplifying the world while still maintaining a useful generalization. This directly influences **combat effectiveness**, dominance in social hierarchies, and the ability to carry objects or traverse difficult terrain.
+- **Restedness** – The monkey’s **energy level**. A well-rested monkey can fight more effectively, socialize with ease, and assert itself in the dominance hierarchy. Low restedness leads to sluggish reactions and reduced ability to maintain or improve status.
+- **Nourishment** – The monkey’s **hunger level**. A well-fed monkey is more capable of engaging in fights, social interactions, and competing for dominance. A hungry monkey will prioritize food-seeking over social climbing or combat.
+- **Hydration Level** – Represents the monkey’s **need for water**. A well-hydrated monkey is better able to engage in fights and social activities, while a dehydrated monkey may struggle to compete and focus on securing water.
 - **Internal Temperature** – Regulates behavior in extreme heat or cold conditions.
 
 ## **3️⃣ Belief Systems & Perception**
@@ -18,6 +18,11 @@ Monkeys form beliefs that shape their understanding of themselves, their group, 
 
 ### **Beliefs About the Self**
 - **Self-Reliance** – Perceived ability to act independently without relying on the group.
+- **Combat Prowess** – Self-assessment of fighting ability based on past encounters.
+- **Attractiveness** – Perception of desirability as a mate, influencing reproductive opportunities.
+- **Cunning** – Belief in one's ability to outsmart others, whether for food, status, or safety.
+- **Resilience** – Confidence in enduring hardships, including injuries, hunger, or social rejection.
+- **Curiosity** – Willingness to explore new areas and engage with unfamiliar objects or situations.
 
 ### **Beliefs About the Group**
 - **Strength Hierarchy** – Identifies the strongest individuals.
@@ -35,7 +40,7 @@ Monkeys form beliefs that shape their understanding of themselves, their group, 
 - **Geographical Awareness** – Recognizes paths to critical resources like food and water.
 
 ## **4️⃣ Core Behavioral Drivers**
-A monkey's decisions are guided by its beliefs and its fundamental needs, which can be categorized into six core **behavioral values**:
+A monkey's decisions are guided by its **physical state, beliefs, and fundamental needs**, which can be categorized into six core **behavioral values**:
 
 | **Behavioral Value**   | **Description** |
 |------------------------|----------------|
@@ -46,7 +51,7 @@ A monkey's decisions are guided by its beliefs and its fundamental needs, which 
 | **Growth**             | Expanding understanding and capabilities. |
 | **Contribution**       | Supporting and helping others in the group. |
 
-Each action the monkey takes is based on an **expected value calculation** of how well it fulfills these needs while increasing **survival and reproductive success**.
+Each action a monkey takes is based on an **internal calculation** of how well the expected outcome of that action aligns with these **behavioral values**. Ultimately, these values serve the monkey’s core goals of **survival and reproductive success** by shaping its priorities and decision-making.
 
 ## **5️⃣ Available Actions**
 Monkeys can take various actions based on their beliefs, status, and immediate needs:
@@ -55,6 +60,8 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 - 🥊 **Fight** – Challenge another monkey to increase rank or defend resources.
 - 🏳 **Submit** – Avoid conflict by showing deference.
 - 🤝 **Request Allyship** – Attempt to form an alliance.
+    - 🍼 **Nurture** – Take care of offspring or close allies.
+    - 🧼 **Groom** – Strengthen bonds by grooming another monkey.
 - ✅ **Accept Allyship** – Strengthen social bonds with a trusted monkey.
 - ❌ **Betray** – Backstab an ally for personal gain.
 - 🔁 **Remember Betrayal** – Store memory of past betrayals.
@@ -63,10 +70,6 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 - 💧 **Get Water** – Seek hydration from the nearest source.
 - 🍌 **Eat** – Consume food to restore nourishment.
 - 🍽 **Share Food** – Offer food to build trust and gain allies.
-
-### **Nurturing & Social Grooming**
-- 🍼 **Nurture** – Take care of offspring or close allies.
-- 🧼 **Groom** – Strengthen bonds by grooming another monkey.
 
 ---
 
