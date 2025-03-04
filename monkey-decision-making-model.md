@@ -74,8 +74,7 @@ Monkeys can take various actions based on their beliefs, status, and immediate n
 ---
 
 ## **Example Implementation**
-```
-python
+```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
