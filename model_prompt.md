@@ -29,26 +29,22 @@ Simulate decision-making in monkeys where the ultimate goal is to maximize **sur
 ### 2. **Critic Network**
 - **Purpose**: Evaluates the chosen action’s value in terms of **long-term survival and reproductive success**.  
 - **Current Idea**: Use a regression model that outputs a scalar value representing the expected future reward (fitness score).  
-- **Open Question**: Should the **critic input** be only the chosen action, or should it also include the same input vector as the actor? Would it be better to concatenate the input vector with the chosen action to provide full context?
+- **Inputs to Critic:** Same input vector as the actor (state). Chosen action (one-hot encoded).
 
 ---
 
-## Key Questions:
-- How should I structure the **critic’s input** to best evaluate the selected action’s value?  
+## Key Questions: 
 - Should the reward signal be derived by quantifying the increase/decrease across the six behavioral values? If so, what’s a good way to model those changes numerically over time?  
-- Are there alternative architectures (e.g., shared layers between actor and critic) that might suit this task better given the complexity of the belief systems?  
+- Are there alternative architectures (e.g., shared layers between actor and critic) that might suit this task better given the complexity of the belief systems? Should I use modules/subnetworks (ie physical state subnetwork, self-beliefs subnetwork, group-beliefs subnetwork, world-beliefs subnetwork, etc.)
 - Would reinforcement learning with episodic simulations be the best training strategy, or would curriculum learning help better simulate the emergence of complex social behavior?
 
 ---
 
-You're on a great track already, this is a fascinating and complex simulation idea. You're blending ethology with reinforcement learning principles here—very cool. Let’s break it down:
-
 # General Structure
-Yes, Sutton’s **Actor-Critic model** fits well, but your application will need thoughtful structuring to capture the social and environmental dynamics of monkey behavior.  
+Sutton’s **Actor-Critic model** fits well, but my application will need thoughtful structuring to capture the social and environmental dynamics of monkey behavior.  
 In real terms: the **Actor** will decide *what* to do given internal and external state vectors, and the **Critic** will evaluate *how good* that action was in terms of fitness (survival and reproductive success).
 
 ## 🧠 Actor Model
-You’ve scoped the actor model really well. Here's how I’d approach it:
 
 ### Input Vector (State)
 Each monkey's state is rich and high-dimensional, which makes this project interesting.
@@ -147,7 +143,7 @@ Where w1 to w6 are tunable parameters depending on how you model "success."
 ## 🧠 Approach to Designing Actor Hidden Layers
 
 ### 1. Think in Modules (Optional)
-Given the complexity of your input, you might consider **modularizing** the network upfront:
+Given the complexity of the input, consider **modularizing** the network upfront:
 
 - **Physical state subnetwork**
 - **Self-beliefs subnetwork**
@@ -163,7 +159,7 @@ Each subnetwork could have **1-2 hidden layers** to embed its features into a mo
 ### 2. General Heuristics for Hidden Layers
 
 #### a. Input size consideration
-- If you have ~30-60 input features (it sounds like you might), you can start with **2-4 layers**.
+- If you have ~30-60 input features (it may apply here), you can start with **2-4 layers**.
 - The first layer typically has **2x to 4x** the size of the input dimension.
 
 **For example:**
@@ -175,19 +171,19 @@ Layer 3: 50-100 units
 Output: softmax(action_space)
 ```
 
-#### b) Gradual funneling
+#### b. Gradual funneling
 You want to reduce the size progressively toward the output layer:
 
 - **Wide → Narrow** pattern is common to help distill relevant information.
 
-#### c) Activation function
+#### c. Activation function
 - Use **ReLU** or **Leaky ReLU** for hidden layers to help with non-linearity.
 - You could also experiment with **GELU** if you want something more modern.
 
 ---
 
 ### 3. Batch Normalization & Dropout
-Since your network will likely be learning in an RL setting where stability is important:
+Since my network will likely be learning in an RL setting where stability is important:
 
 - Consider using **BatchNorm** after your dense layers.
 - A small **Dropout** (0.1-0.3) might help prevent overfitting, but RL networks are often more data-efficient so this might be situational.
@@ -195,7 +191,7 @@ Since your network will likely be learning in an RL setting where stability is i
 ---
 
 ### 4. Latent Space Size
-Since this is a decision-making agent (actor), you want the latent layers to:
+Since this is a decision-making agent (actor), the latent layers should:
 
 - Capture **social cues** (e.g., group dynamics)
 - Balance **exploration and exploitation** tendencies
@@ -222,4 +218,225 @@ You want enough capacity to store subtle features like *"how much I trust Monkey
 - Would the monkey’s **dominance rank alone** shift how the Actor chooses actions?
 - Would the **physical states** (e.g., high thirst) overpower **social drives** (e.g., grooming) in decision-making?
 - You could try **attention mechanisms** later to weigh these subsystems dynamically.
+
+## 1️⃣ How to generate initial state & belief data
+Since this is a simulation, you have some creative freedom, but you’ll want the initial states and beliefs to be:
+
+- **Biologically plausible**
+- **Sufficiently varied** (for exploration)
+- **Internally consistent** (a monkey with high strength might also be perceived as higher ranking)
+
+---
+
+## 🧪 Ideas to generate initial monkey states/beliefs
+
+### A. Randomized, but weighted distributions
+For physical stats (e.g., strength, hydration):
+- Sample from **normal** or **beta distributions** centered around species norms.
+
+**Example:**
+- Strength ~ `N(0.5, 0.1)`
+- Hydration ~ `U(0.7, 1.0)` (if they’re starting fresh in a new environment).
+
+---
+
+### B. Hierarchical priors
+**Dominance rank** can be seeded using **rank-based priors**, e.g.:
+
+- Monkeys ranked higher at the start get slightly higher:
+  - Strength
+  - Self-confidence (fighting ability, endurance)
+  - Group perception of them
+
+- Lower-rank monkeys might get higher:
+  - Curiosity
+  - Social bonding orientation
+
+---
+
+### C. Personality Archetypes (optional flavor)
+Assign **"personality archetypes"** to diversify:
+
+- **"Bold Alpha"** = High strength + low curiosity + high dominance.
+- **"Wily Outsider"** = Medium strength + high cunning + low connection.
+- **"Social Butterfly"** = Medium-low strength + high connection + low self-confidence.
+- **"Hermit Explorer"** = High curiosity + low connection + high independence.
+
+*These archetypes can bias how initial states & beliefs are sampled for each monkey.*
+
+---
+
+### D. Environmental context dependency
+If starting the simulation in a **"hostile environment"** (e.g., scarce food or presence of predators), then:
+- Start **hydration/nourishment** lower on average.
+- Increase **group cohesion beliefs** (banding together to survive).
+
+---
+
+### E. Belief noise
+- Add **small Gaussian noise** to self and group beliefs to make each monkey unique (even within archetypes).
+
+### Concrete fields to randomize
+
+| **Category**            | **Example fields**                                 | **Sampling approach**                                     |
+|-------------------------|----------------------------------------------------|-----------------------------------------------------------|
+| **Physical State**       | Strength, Hydration, Nourishment                   | Normal/Uniform distributions                              |
+| **Self-Beliefs**         | Independence, Mate value, Cunning                  | Based on rank/archetype + noise                           |
+| **Group Beliefs**        | Trust in others, threat perception                 | Derived from randomized monkey relationships              |
+| **Group Role Beliefs**   | Dominance perception, peer perceptions             | Can loosely match actual social hierarchy + noise         |
+| **World Beliefs**        | Perceived food abundance, threat level             | Related to global environment config                      |
+
+---
+
+## 2️⃣ Should you create a framework for labeling what outputs should be?
+
+**Short answer:**  
+Not exactly — but you DO need a **reward-shaping framework**.
+
+### 🧠 Why?
+In reinforcement learning, you typically don’t supervise with "correct action labels."  
+Instead, you **reward or penalize actions based on their consequences**.
+
+---
+
+### What you do need:
+
+### A. A "reward function" framework
+This will determine **how to reward or punish actions** based on your six core values (certainty, variety, etc.).
+
+**For example:**
+- If a monkey **shares food**, increase its **Connection** and **Contribution** rewards.
+- If a monkey **explores alone**, increase **Variety** but reduce **Certainty** (risk).
+- If a monkey **challenges a rival**, boost **Significance** but with a risk of injury.
+
+---
+
+### B. A mechanism to record actual outcomes:
+Track **episodic summaries** like:
+- Was the monkey well-fed by the end?
+- Did it strengthen alliances?
+- Was its social status improved?
+
+*This is how you’ll retroactively know if the action was good or bad (which feeds into the Critic’s learning process).*
+
+---
+
+### ⚠️ Warning:
+If you labeled what action the monkey "should take" directly, you'd be turning this into a **supervised learning problem** (which wouldn't generalize as well to emergent behavior).
+
+---
+
+### 🔄 Alternative idea (Hybrid approach):
+You could create a rough set of **heuristic policies** (e.g., "if thirsty, prioritize finding water") to **bootstrap training early on**, and then let the Actor gradually replace heuristics with learned policies.  
+This is sometimes called **"Imitation Learning"** or **"Behavioral Cloning" + RL**.
+
+---
+
+# 🌍 Environment Dynamics Framework
+
+## 🔄 1. Physical State Updates
+Physical states should degrade or improve with time and actions.
+
+| **Physical State**       | **Action/Event Impact**                                                                     |
+|--------------------------|---------------------------------------------------------------------------------------------|
+| **Strength**             | Gradually decays if malnourished or dehydrated; increases with rest, decreases after fights |
+| **Restedness**           | Decreases over time or after high-effort actions; increases with sleep/rest actions         |
+| **Nourishment**          | Slowly declines over time; increases after successful foraging or sharing food              |
+| **Hydration**            | Declines every time step; replenished by finding water                                      |
+| **Internal Temperature** | Fluctuates with environment (hot/cold weather, exertion); extreme values reduce Certainty reward |
+
+💡 *Tip: Create baseline environmental cycles like day/night or dry/wet seasons that make survival harder or easier.*
+
+---
+
+## 🧠 2. Belief Updates
+Beliefs about self, group, and world should evolve based on experience, creating feedback loops.
+
+### A) Self-beliefs
+
+| **Self-Belief**               | **Action/Event Impact**                                                   |
+|-------------------------------|---------------------------------------------------------------------------|
+| **Independence**              | Increases if monkey succeeds when acting alone; decreases if rescued by allies |
+| **Fighting ability confidence**| Increases after winning fights; decreases after losses or injuries         |
+| **Mate desirability**         | Increases after positive mating/social interactions; decreases after rejection or humiliation |
+| **Cunning/outsmarting others**| Improves if successfully steals food or manipulates rivals                  |
+| **Hardship endurance**        | Improves if monkey survives harsh conditions                               |
+| **Curiosity**                 | Increases if rewarded after exploration; may decrease if exploration leads to danger |
+
+---
+
+### B) Group Beliefs
+
+| **Group Belief**                                  | **Action/Event Impact**                                                      |
+|---------------------------------------------------|------------------------------------------------------------------------------|
+| **Trust in Ally X**                               | Increases after grooming, sharing food, mutual defense                       |
+| **Suspicion of Rival Y (betrayal risk)**          | Increases after witnessing betrayal, or hearing alarm calls against Y        |
+| **Perceived group’s strongest member**            | Updates after observing fights, displays of dominance                        |
+| **Well-liked member perception**                  | Increases after observing social bonding events (grooming others, alliances) |
+
+💡 *Tip: Introduce slight observation errors ("partial observability") — monkeys might occasionally misjudge others.*
+
+---
+
+### C) Beliefs about Role in Group
+
+| **Role Belief**                                    | **Action/Event Impact**                                                        |
+|----------------------------------------------------|--------------------------------------------------------------------------------|
+| **Perceived dominance rank**                       | Increases after wins or displays of power; decreases after defeat              |
+| **Perceived how others see me (peer respect)**     | Improves after helping others or receiving attention from group leaders        |
+
+---
+
+### D) World Beliefs
+
+| **World Belief**                                   | **Action/Event Impact**                                                        |
+|----------------------------------------------------|--------------------------------------------------------------------------------|
+| **Food/Water availability perception**             | Adjusted after foraging success/failure or observing scarcity in others        |
+| **External threat level (predators)**              | Spikes after encountering predators or hearing alarm calls                     |
+| **Rival group threat level**                       | Increases after skirmishes or signs of other tribes                           |
+| **Knowledge of paths to resources**                | Expands after successful explorations (could add a "map" or spatial memory)    |
+
+---
+
+## ⚙️ 3. Natural Decay/Forgetting
+- Some beliefs should **decay over time** if not reinforced.
+  - E.g., if Monkey A hasn’t helped Monkey B in a while, trust gradually erodes.
+  - **Confidence** might also fall after long periods without success.
+
+---
+
+## 💡 4. Emergent Group Effects
+- **Ripple effects:** If a high-ranking monkey is defeated, all monkeys should reassess their group beliefs.
+- **Group tension meter:** Could track overall tension (e.g., scarcity or frequent fights make everyone warier).
+
+---
+
+## 🔄 5. External Environment Dynamics
+
+| **World Element**     | **Dynamic changes**                                              |
+|-----------------------|------------------------------------------------------------------|
+| **Food supply**       | Cycles seasonally (wet/dry season), decays after over-foraging   |
+| **Water sources**     | Rivers might dry up, forcing new exploration                     |
+| **Weather cycles**    | Affect temperature, foraging success, and exertion costs         |
+| **Predator frequency**| Increases at night or during certain seasons                     |
+| **Group migrations**  | Could force relocation or encounters with rival groups           |
+
+---
+
+## 🎯 Goal: Feedback Loop
+Monkey actions update internal state and beliefs → beliefs influence next decisions via the Actor network → decisions alter environment & social dynamics → loop continues.
+
+---
+
+## ⚠️ Design Challenge
+Balance **stability** (so monkeys don’t all die immediately) with **pressure** (to encourage learning meaningful survival & social strategies).
+
+---
+
+👉 **Next Step Options:**
+- We could outline **reward functions** for each of your six behavioral values.
+- Or, sketch out **sample simulation runs** (e.g., "Day in the Life of Monkey A") to visualize how all of this plays out.
+
+
+
 
