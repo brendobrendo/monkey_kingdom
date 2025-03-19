@@ -186,7 +186,9 @@ You want to reduce the size progressively toward the output layer:
 Since my network will likely be learning in an RL setting where stability is important:
 
 - Consider using **BatchNorm** after your dense layers.
+    - Batch Normalization stabilizes training by normalizing the outputs of each layer to have a consistent mean and variance across mini-batches, reducing internal covariate shift. In your actor-critic model, it helps keep activations steady despite noisy or highly variable reinforcement signals, leading to smoother learning and faster convergence, especially in environments with complex social dynamics like yours.
 - A small **Dropout** (0.1-0.3) might help prevent overfitting, but RL networks are often more data-efficient so this might be situational.
+    - Dropout randomly deactivates a fraction of neurons during training to prevent the network from overfitting to early patterns or noise. In your RL setting, applying light dropout (e.g., 0.1–0.3) after dense layers can improve generalization by encouraging more robust representations, although it’s typically used sparingly in RL due to the naturally high variability in agent experiences.
 
 ---
 
@@ -199,6 +201,8 @@ Since this is a decision-making agent (actor), the latent layers should:
 
 A **latent space** (penultimate layer) of about **32-64 units** could be a good starting point.  
 You want enough capacity to store subtle features like *"how much I trust Monkey A"* or *"how badly I need water."*
+
+A **compressed latent space** refers to creating a more **compact, lower-dimensional representation** of the input data after it's processed by each subnetwork. When I modularize my **Actor model** into subnetworks, each one processes a chunk of your input (e.g., physical state, social beliefs, environment). Each subnetwork transforms that input into a latent space—basically, an intermediate representation (vector) that captures the essence of that input block.
 
 ---
 
@@ -352,7 +356,7 @@ Physical states should degrade or improve with time and actions.
 ## 🧠 2. Belief Updates
 Beliefs about self, group, and world should evolve based on experience, creating feedback loops.
 
-### A) Self-beliefs
+### A. Self-beliefs
 
 | **Self-Belief**               | **Action/Event Impact**                                                   |
 |-------------------------------|---------------------------------------------------------------------------|
@@ -365,7 +369,7 @@ Beliefs about self, group, and world should evolve based on experience, creating
 
 ---
 
-### B) Group Beliefs
+### B. Group Beliefs
 
 | **Group Belief**                                  | **Action/Event Impact**                                                      |
 |---------------------------------------------------|------------------------------------------------------------------------------|
@@ -378,7 +382,7 @@ Beliefs about self, group, and world should evolve based on experience, creating
 
 ---
 
-### C) Beliefs about Role in Group
+### C. Beliefs about Role in Group
 
 | **Role Belief**                                    | **Action/Event Impact**                                                        |
 |----------------------------------------------------|--------------------------------------------------------------------------------|
@@ -387,7 +391,7 @@ Beliefs about self, group, and world should evolve based on experience, creating
 
 ---
 
-### D) World Beliefs
+### D. World Beliefs
 
 | **World Belief**                                   | **Action/Event Impact**                                                        |
 |----------------------------------------------------|--------------------------------------------------------------------------------|
@@ -430,6 +434,9 @@ Monkey actions update internal state and beliefs → beliefs influence next deci
 
 ## ⚠️ Design Challenge
 Balance **stability** (so monkeys don’t all die immediately) with **pressure** (to encourage learning meaningful survival & social strategies).
+- **Stability** refers to how well your actor-critic system avoids catastrophic or chaotic behavior early in training—basically, preventing the system from going off the rails before it has a chance to learn useful policies.
+- Stability = Avoiding situations where all your agents (monkeys) engage in actions that lead to mass die-offs, social collapse, or extreme maladaptive behavior patterns before learning can meaningfully occur.
+- For example, if early training causes most monkeys to constantly fight and die of injuries or starve because they fail to forage, the learning signal (from the Critic) could be so noisy or uniformly negative that your Actor never gets useful gradients to improve.
 
 ---
 
