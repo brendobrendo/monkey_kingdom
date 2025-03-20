@@ -447,18 +447,6 @@ Balance **stability** (so monkeys don’t all die immediately) with **pressure**
 
 # Neural Network Framework to Simulate Monkey Behavior (Actor-Critic Model with Shared Backbone and Modular Subnetworks)
 
-## 🎯 Project Goal
-Simulate decision-making in monkeys with the overarching aim of maximizing **survival and reproductive success**, measured via six behavioral values:
-
-- Certainty
-- Variety
-- Significance
-- Connection
-- Growth
-- Contribution
-
----
-
 ## 🧩 Architecture Overview
 
 ### 🔄 Shared Backbone Network (Feature Extractor)
@@ -508,44 +496,6 @@ Simulate decision-making in monkeys with the overarching aim of maximizing **sur
 - **Output**: Single scalar value estimating **V(s, a)**.
 
 ---
-
-## 🧪 Input Schema Breakdown
-
-### 🟢 **State Input:**
-
-| Subnetwork              | Features                                                            |
-|-------------------------|---------------------------------------------------------------------|
-| Physical State          | strength, restedness, nourishment, hydration, temperature           |
-| Self-Beliefs            | independence, fighting ability, desirability, cunning, endurance, curiosity |
-| Group Beliefs           | perceived dominance ranks, allies, betrayers, respect metrics       |
-| Role Perception         | self-assessed dominance rank, perceived social standing             |
-| Environmental Beliefs   | predators, food/water scarcity, terrain safety, knowledge of paths  |
-
----
-
-## 🎲 Action Space
-Softmax output from Actor head:
-- Groom another monkey
-- Challenge another monkey
-- Forage for food
-- Seek water
-- Explore new area
-- Flee from threat
-- Approach a group
-- Isolate/Rest
-- Mating attempt
-- Share food/resource
-- Play (for younger monkeys)
-
----
-
-## 🎯 Reward Structure
-
-Composite reward as a weighted sum of six dimensions:
-
-```python
-Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w5 * Growth + w6 * Contribution
-```
 
 ## 🧠 Learning Framework
 - Actor-Critic loss based on **TD-error**:
