@@ -12,24 +12,109 @@ Simulate decision-making in monkeys where the ultimate goal is to maximize **sur
 
 ---
 
-## Proposed Structure:
+## 🧩 Architecture Overview
 
-### 1. **Actor Network**
-- **Purpose**: Selects an action from a predefined action space using a softmax output layer.  
-- **Input Vector** (features):  
-  - **Physical State**: strength, restedness, nourishment, hydration level, internal temperature  
-  - **Self-Beliefs**: perceived independence, self-assessed fighting ability, perceived desirability as a mate, belief in outsmarting others, endurance confidence, curiosity  
-  - **Group Beliefs**: identification of strongest individuals, popularity metrics, allies, potential betrayers  
-  - **Role Perception**: dominance rank estimation, perception of how others see it  
-  - **Environmental Beliefs**: external threats, food/water availability, predators, hazardous terrain, paths to resources  
-- **Output**: Probability distribution over possible actions (e.g., forage, rest, groom, challenge, flee, explore, etc.) via softmax.
+### 🔄 Shared Backbone Network (Feature Extractor)
+**Purpose**: Extracts high-level features from state inputs, which are then passed to both Actor and Critic heads.  
+**Structure**: Combines multiple modular subnetworks into a shared representation.
+
+### Modular Subnetworks feeding into the Shared Backbone:
+
+#### **Physical State Subnetwork**
+- **Inputs**: strength, restedness, nourishment, hydration, internal temperature  
+- **Output**: Feature vector capturing internal physical readiness and needs.
+
+#### **Self-Belief Subnetwork**
+- **Inputs**: independence, fighting ability, mate desirability, cunning, endurance confidence, curiosity  
+- **Output**: Feature vector capturing self-assessment and internal beliefs.
+
+#### **Group Belief Subnetwork**
+- **Inputs**: knowledge of other monkeys’ ranks, allies, betrayers, popularity metrics  
+- **Output**: Representation of social knowledge and alliances.
+
+#### **Role Perception Subnetwork**
+- **Inputs**: self-assessed dominance rank, perceived external perception  
+- **Output**: How the monkey sees its role in the group hierarchy.
+
+#### **Environmental Belief Subnetwork**
+- **Inputs**: threat levels, food/water scarcity, terrain safety, known paths  
+- **Output**: World modeling and external environmental beliefs.
+
+👉 **All subnetwork outputs are concatenated into a shared feature vector**, processed by additional shared layers (MLP, LSTM, or Transformer block depending on task complexity).
 
 ---
 
-### 2. **Critic Network**
-- **Purpose**: Evaluates the chosen action’s value in terms of **long-term survival and reproductive success**.  
-- **Current Idea**: Use a regression model that outputs a scalar value representing the expected future reward (fitness score).  
-- **Inputs to Critic:** Same input vector as the actor (state). Chosen action (one-hot encoded).
+## 🧠 Actor-Critic Head Split
+
+### Shared Layers Output → Splits into:
+
+### 1️⃣ Actor Head
+- **Purpose**: Outputs action probabilities via softmax.  
+- **Inputs**: Shared feature representation  
+- **Output**: Categorical distribution over possible actions.
+
+### 2️⃣ Critic Head
+- **Purpose**: Outputs a scalar value of the action’s long-term reward.  
+- **Inputs**:
+  - Shared feature representation  
+  - Action (one-hot encoded) concatenated with shared features  
+- **Output**: Single scalar value estimating **V(s, a)**.
+
+---
+
+## 🧠 Learning Framework
+- Actor-Critic loss based on **TD-error**:
+
+  ![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
+- **Actor** updated via policy gradients.
+- **Critic** optimized via regression loss on TD-targets.
+
+---
+
+## ⚙ Benefits of this Setup
+- ✅ Shared layers reduce redundancy and improve learning stability.
+- ✅ Subnetworks allow specialization within each "belief system" or domain of monkey cognition.
+- ✅ Flexible enough to plug in attention mechanisms later (e.g., for focusing on most relevant group members or environmental factors).
+
+## 🧠 What is TD-error?
+
+At its core, **TD-error** is the difference between:
+
+1. What your **Critic predicted** the value of taking action `a` in state `s` would be (**V(s, a)**).
+2. What you **actually observed** after taking that action, plus what you now expect the next state to bring in terms of future value.
+
+### Mathematically:
+![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
+
+Where:
+- `r` = reward received after taking action `a` in state `s`
+- `γ` = discount factor (how much future rewards are "worth" compared to immediate rewards, typically between 0.9 and 0.99)
+- `V(s', a')` = critic’s estimate of the next state-action pair’s value
+- `V(s, a)` = critic’s estimate of the current state-action value before taking the action
+
+---
+
+## 🎯 Goal: Minimize TD-error
+Your Critic is trained to **minimize** this TD-error over time. In other words, the Critic wants its predictions to match reality as closely as possible.
+
+- When **δ = 0**, your value estimates are perfect.
+- If **δ ≠ 0**, that’s a "mistake," and the Critic updates its weights to bring its value estimate closer to the new target:  
+  
+  ![Target](https://latex.codecogs.com/svg.image?r%20+%20\gamma%20V(s',%20a'))
+
+
+---
+
+## 🧠 But what about the Actor?
+
+While the Critic **minimizes TD-error**, the Actor uses **δ as a signal**:
+
+- If **δ > 0**, it means the action taken performed **better than expected** — the Actor is encouraged to increase the probability of taking that action again in similar states.
+- If **δ < 0**, it means the action performed **worse than expected** — the Actor is discouraged from repeating it.
+
+### In short:
+- The **Critic** is a value estimator → **minimize TD-error**.
+- The **Actor** is a policy optimizer → **maximize expected returns**, guided by **δ** as feedback.
 
 ---
 
@@ -445,111 +530,6 @@ Balance **stability** (so monkeys don’t all die immediately) with **pressure**
 - Or, sketch out **sample simulation runs** (e.g., "Day in the Life of Monkey A") to visualize how all of this plays out.
 
 
-# Neural Network Framework to Simulate Monkey Behavior (Actor-Critic Model with Shared Backbone and Modular Subnetworks)
-
-## 🧩 Architecture Overview
-
-### 🔄 Shared Backbone Network (Feature Extractor)
-**Purpose**: Extracts high-level features from state inputs, which are then passed to both Actor and Critic heads.  
-**Structure**: Combines multiple modular subnetworks into a shared representation.
-
-### Modular Subnetworks feeding into the Shared Backbone:
-
-#### **Physical State Subnetwork**
-- **Inputs**: strength, restedness, nourishment, hydration, internal temperature  
-- **Output**: Feature vector capturing internal physical readiness and needs.
-
-#### **Self-Belief Subnetwork**
-- **Inputs**: independence, fighting ability, mate desirability, cunning, endurance confidence, curiosity  
-- **Output**: Feature vector capturing self-assessment and internal beliefs.
-
-#### **Group Belief Subnetwork**
-- **Inputs**: knowledge of other monkeys’ ranks, allies, betrayers, popularity metrics  
-- **Output**: Representation of social knowledge and alliances.
-
-#### **Role Perception Subnetwork**
-- **Inputs**: self-assessed dominance rank, perceived external perception  
-- **Output**: How the monkey sees its role in the group hierarchy.
-
-#### **Environmental Belief Subnetwork**
-- **Inputs**: threat levels, food/water scarcity, terrain safety, known paths  
-- **Output**: World modeling and external environmental beliefs.
-
-👉 **All subnetwork outputs are concatenated into a shared feature vector**, processed by additional shared layers (MLP, LSTM, or Transformer block depending on task complexity).
-
----
-
-## 🧠 Actor-Critic Head Split
-
-### Shared Layers Output → Splits into:
-
-### 1️⃣ Actor Head
-- **Purpose**: Outputs action probabilities via softmax.  
-- **Inputs**: Shared feature representation  
-- **Output**: Categorical distribution over possible actions.
-
-### 2️⃣ Critic Head
-- **Purpose**: Outputs a scalar value of the action’s long-term reward.  
-- **Inputs**:
-  - Shared feature representation  
-  - Action (one-hot encoded) concatenated with shared features  
-- **Output**: Single scalar value estimating **V(s, a)**.
-
----
-
-## 🧠 Learning Framework
-- Actor-Critic loss based on **TD-error**:
-
-  ![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
-- **Actor** updated via policy gradients.
-- **Critic** optimized via regression loss on TD-targets.
-
----
-
-## ⚙ Benefits of this Setup
-- ✅ Shared layers reduce redundancy and improve learning stability.
-- ✅ Subnetworks allow specialization within each "belief system" or domain of monkey cognition.
-- ✅ Flexible enough to plug in attention mechanisms later (e.g., for focusing on most relevant group members or environmental factors).
-
-## 🧠 What is TD-error?
-
-At its core, **TD-error** is the difference between:
-
-1. What your **Critic predicted** the value of taking action `a` in state `s` would be (**V(s, a)**).
-2. What you **actually observed** after taking that action, plus what you now expect the next state to bring in terms of future value.
-
-### Mathematically:
-![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
-
-Where:
-- `r` = reward received after taking action `a` in state `s`
-- `γ` = discount factor (how much future rewards are "worth" compared to immediate rewards, typically between 0.9 and 0.99)
-- `V(s', a')` = critic’s estimate of the next state-action pair’s value
-- `V(s, a)` = critic’s estimate of the current state-action value before taking the action
-
----
-
-## 🎯 Goal: Minimize TD-error
-Your Critic is trained to **minimize** this TD-error over time. In other words, the Critic wants its predictions to match reality as closely as possible.
-
-- When **δ = 0**, your value estimates are perfect.
-- If **δ ≠ 0**, that’s a "mistake," and the Critic updates its weights to bring its value estimate closer to the new target:  
-  
-  ![Target](https://latex.codecogs.com/svg.image?r%20+%20\gamma%20V(s',%20a'))
-
-
----
-
-## 🧠 But what about the Actor?
-
-While the Critic **minimizes TD-error**, the Actor uses **δ as a signal**:
-
-- If **δ > 0**, it means the action taken performed **better than expected** — the Actor is encouraged to increase the probability of taking that action again in similar states.
-- If **δ < 0**, it means the action performed **worse than expected** — the Actor is discouraged from repeating it.
-
-### In short:
-- The **Critic** is a value estimator → **minimize TD-error**.
-- The **Actor** is a policy optimizer → **maximize expected returns**, guided by **δ** as feedback.
 
 
 
