@@ -548,7 +548,8 @@ Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w
 ```
 
 ## 🧠 Learning Framework
-- Actor-Critic loss based on **TD-error**:  
+- Actor-Critic loss based on **TD-error**:
+
   ![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
 - **Actor** updated via policy gradients.
 - **Critic** optimized via regression loss on TD-targets.
@@ -568,9 +569,7 @@ At its core, **TD-error** is the difference between:
 2. What you **actually observed** after taking that action, plus what you now expect the next state to bring in terms of future value.
 
 ### Mathematically:
-\[
-\delta = r + \gamma V(s', a') - V(s, a)
-\]
+![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
 
 Where:
 - `r` = reward received after taking action `a` in state `s`
