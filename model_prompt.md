@@ -549,9 +549,7 @@ Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w
 
 ## 🧠 Learning Framework
 - Actor-Critic loss based on **TD-error**:  
-  \[
-  \delta = r + \gamma V(s', a') - V(s, a)
-  \]
+  ![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
 - **Actor** updated via policy gradients.
 - **Critic** optimized via regression loss on TD-targets.
 
@@ -603,18 +601,6 @@ While the Critic **minimizes TD-error**, the Actor uses **δ as a signal**:
 ### In short:
 - The **Critic** is a value estimator → **minimize TD-error**.
 - The **Actor** is a policy optimizer → **maximize expected returns**, guided by **δ** as feedback.
-
----
-
-## 🧩 Analogy:
-Think of it like this:
-- The **Critic** is a teacher grading how well the student (the Actor) performed.
-- The **Actor** is the student trying to take actions that consistently "score well" based on the teacher’s feedback (the TD-error).
-
----
-
-## 💡 Why is this useful?
-Because instead of waiting for the final outcome of an episode (which is slow), you **learn on each step** by comparing what happened immediately to what was predicted. This is why it’s called **"temporal difference" learning** — it bootstraps from predictions at time **t+1** to update predictions at time **t**.
 
 
 
