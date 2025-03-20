@@ -155,7 +155,6 @@ Where w1 to w6 are tunable parameters depending on how you model "success."
 - Critic receives `(state, action)` and gets reward from environment.
 - Actor and Critic update based on TD-error (Temporal Difference error).
 
-
 ---
 
 ## ⚙ Benefits of this Setup
