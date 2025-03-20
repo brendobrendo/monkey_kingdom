@@ -584,9 +584,9 @@ Your Critic is trained to **minimize** this TD-error over time. In other words, 
 
 - When **δ = 0**, your value estimates are perfect.
 - If **δ ≠ 0**, that’s a "mistake," and the Critic updates its weights to bring its value estimate closer to the new target:  
-  \[
-  r + \gamma V(s', a')
-  \]
+  
+  ![Target](https://latex.codecogs.com/svg.image?r%20+%20\gamma%20V(s',%20a'))
+
 
 ---
 
