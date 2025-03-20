@@ -14,9 +14,71 @@ Simulate decision-making in monkeys where the ultimate goal is to maximize **sur
 
 ## 🧩 Architecture Overview
 
+In real terms: the **Actor** will decide *what* to do given internal and external state vectors, and the **Critic** will evaluate *how good* that action was in terms of fitness (survival and reproductive success). Based on Sutton's Actor-Critic Network.
+
 ### 🔄 Shared Backbone Network (Feature Extractor)
 **Purpose**: Extracts high-level features from state inputs, which are then passed to both Actor and Critic heads.  
 **Structure**: Combines multiple modular subnetworks into a shared representation.
+
+### 🧠 Actor Model
+
+#### Input Vector (State)
+Each monkey's state is rich and high-dimensional, which makes this project interesting.
+
+**Physical state (continuous values):**
+- Strength (0-1)
+- Restedness (0-1)
+- Nourishment (0-1)
+- Hydration (0-1)
+- Internal temperature (normalized)
+
+**Beliefs about self (continuous values, perhaps [-1,1] to capture confidence/uncertainty):**
+- Independence
+- Fighting ability
+- Mate desirability
+- Cunning/outsmarting others
+- Hardship endurance
+- Curiosity
+
+**Beliefs about the group (e.g., top-N ranked peers or embeddings of peer relationships):**
+- Dominance ranks of other monkeys (maybe as a vector of 5-10 slots)
+- Group sentiment scores (ally/betrayer likelihood, respect levels, etc.)
+
+**Beliefs about role in group:**
+- Self-assessed dominance rank
+- Perceived social perception by others
+
+**Beliefs about the external world:**
+- Threat levels (predators, rivals)
+- Food/water scarcity (0-1)
+- Safety of terrain (0-1)
+- Knowledge of paths to resources (binary or probability)
+
+#### Output (Action Space)
+Discrete actions (softmaxed):
+- Groom another monkey
+- Challenge another monkey
+- Forage for food
+- Seek water
+- Explore new area
+- Flee from threat
+- Approach a group
+- Isolate/Rest
+- Mating attempt
+- Share food/resource
+- Play (for younger monkeys)
+
+### 🎯 Critic Model
+You're right about the Critic being a regression model, but let’s refine it a bit.
+
+**Goal:**  
+Output a "value function" that estimates expected cumulative reward (fitness value) based on the current state **AND** the action taken.
+
+**Inputs to Critic:**
+- Same input vector as the actor (state)
+- Chosen action (one-hot encoded)
+
+So technically, it learns **V(s,a)** — a value estimate for taking action `a` in state `s`.
 
 ### Modular Subnetworks feeding into the Shared Backbone:
 
@@ -69,6 +131,31 @@ Simulate decision-making in monkeys where the ultimate goal is to maximize **sur
 - **Actor** updated via policy gradients.
 - **Critic** optimized via regression loss on TD-targets.
 
+### 🧩 Reward Design
+Since survival & reproduction is the long-term goal, you need to define **instantaneous rewards** after each action. This is tricky and will shape learning.
+
+Use your behavioral values as dimensions of reward:
+- **Certainty:** Does the action reduce exposure to threats?
+- **Variety:** Does the action lead to new information or environments?
+- **Significance:** Does the action increase social rank or status?
+- **Connection:** Does the action improve relationships (e.g., grooming)?
+- **Growth:** Does it help learn about the world (e.g., exploration)?
+- **Contribution:** Does it increase group harmony (e.g., sharing)?
+
+These can be combined into a **weighted sum** to create a fitness proxy:
+
+```python
+Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w5 * Growth + w6 * Contribution
+```
+Where w1 to w6 are tunable parameters depending on how you model "success."
+
+### 🔄 Learning Loop
+- Actor proposes an action based on state.
+- Action executed → Environment updates.
+- Critic receives `(state, action)` and gets reward from environment.
+- Actor and Critic update based on TD-error (Temporal Difference error).
+
+
 ---
 
 ## ⚙ Benefits of this Setup
@@ -116,102 +203,7 @@ While the Critic **minimizes TD-error**, the Actor uses **δ as a signal**:
 - The **Critic** is a value estimator → **minimize TD-error**.
 - The **Actor** is a policy optimizer → **maximize expected returns**, guided by **δ** as feedback.
 
----
-
-## Key Questions: 
-- Should the reward signal be derived by quantifying the increase/decrease across the six behavioral values? If so, what’s a good way to model those changes numerically over time?  
-- Are there alternative architectures (e.g., shared layers between actor and critic) that might suit this task better given the complexity of the belief systems? Should I use modules/subnetworks (ie physical state subnetwork, self-beliefs subnetwork, group-beliefs subnetwork, world-beliefs subnetwork, etc.)
-- Would reinforcement learning with episodic simulations be the best training strategy, or would curriculum learning help better simulate the emergence of complex social behavior?
-
----
-
-# General Structure
-Sutton’s **Actor-Critic model** fits well, but my application will need thoughtful structuring to capture the social and environmental dynamics of monkey behavior.  
-In real terms: the **Actor** will decide *what* to do given internal and external state vectors, and the **Critic** will evaluate *how good* that action was in terms of fitness (survival and reproductive success).
-
-## 🧠 Actor Model
-
-### Input Vector (State)
-Each monkey's state is rich and high-dimensional, which makes this project interesting.
-
-**Physical state (continuous values):**
-- Strength (0-1)
-- Restedness (0-1)
-- Nourishment (0-1)
-- Hydration (0-1)
-- Internal temperature (normalized)
-
-**Beliefs about self (continuous values, perhaps [-1,1] to capture confidence/uncertainty):**
-- Independence
-- Fighting ability
-- Mate desirability
-- Cunning/outsmarting others
-- Hardship endurance
-- Curiosity
-
-**Beliefs about the group (e.g., top-N ranked peers or embeddings of peer relationships):**
-- Dominance ranks of other monkeys (maybe as a vector of 5-10 slots)
-- Group sentiment scores (ally/betrayer likelihood, respect levels, etc.)
-
-**Beliefs about role in group:**
-- Self-assessed dominance rank
-- Perceived social perception by others
-
-**Beliefs about the external world:**
-- Threat levels (predators, rivals)
-- Food/water scarcity (0-1)
-- Safety of terrain (0-1)
-- Knowledge of paths to resources (binary or probability)
-
-### Output (Action Space)
-Discrete actions (softmaxed):
-- Groom another monkey
-- Challenge another monkey
-- Forage for food
-- Seek water
-- Explore new area
-- Flee from threat
-- Approach a group
-- Isolate/Rest
-- Mating attempt
-- Share food/resource
-- Play (for younger monkeys)
-
-## 🎯 Critic Model
-You're right about the Critic being a regression model, but let’s refine it a bit.
-
-**Goal:**  
-Output a "value function" that estimates expected cumulative reward (fitness value) based on the current state **AND** the action taken.
-
-**Inputs to Critic:**
-- Same input vector as the actor (state)
-- Chosen action (one-hot encoded)
-
-So technically, it learns **V(s,a)** — a value estimate for taking action `a` in state `s`.
-
-## 🧩 Reward Design
-Since survival & reproduction is the long-term goal, you need to define **instantaneous rewards** after each action. This is tricky and will shape learning.
-
-Use your behavioral values as dimensions of reward:
-- **Certainty:** Does the action reduce exposure to threats?
-- **Variety:** Does the action lead to new information or environments?
-- **Significance:** Does the action increase social rank or status?
-- **Connection:** Does the action improve relationships (e.g., grooming)?
-- **Growth:** Does it help learn about the world (e.g., exploration)?
-- **Contribution:** Does it increase group harmony (e.g., sharing)?
-
-These can be combined into a **weighted sum** to create a fitness proxy:
-
-```python
-Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w5 * Growth + w6 * Contribution
-```
-Where w1 to w6 are tunable parameters depending on how you model "success."
-
-## 🔄 Learning Loop
-- Actor proposes an action based on state.
-- Action executed → Environment updates.
-- Critic receives `(state, action)` and gets reward from environment.
-- Actor and Critic update based on TD-error (Temporal Difference error).
+---  
 
 ## 🔍 Other considerations
 - **Memory/Belief Update:** Beliefs about group or external world should update after each step (e.g., if Monkey A helps Monkey B, B’s belief in A being an ally strengthens).
@@ -522,6 +514,13 @@ Balance **stability** (so monkeys don’t all die immediately) with **pressure**
 - **Stability** refers to how well your actor-critic system avoids catastrophic or chaotic behavior early in training—basically, preventing the system from going off the rails before it has a chance to learn useful policies.
 - Stability = Avoiding situations where all your agents (monkeys) engage in actions that lead to mass die-offs, social collapse, or extreme maladaptive behavior patterns before learning can meaningfully occur.
 - For example, if early training causes most monkeys to constantly fight and die of injuries or starve because they fail to forage, the learning signal (from the Critic) could be so noisy or uniformly negative that your Actor never gets useful gradients to improve.
+
+---
+
+## Key Questions: 
+- Should the reward signal be derived by quantifying the increase/decrease across the six behavioral values? If so, what’s a good way to model those changes numerically over time?  
+- Would reinforcement learning with episodic simulations be the best training strategy, or would curriculum learning help better simulate the emergence of complex social behavior?
+- How should I use attention mechanisms to weigh the subsystems dynamically?
 
 ---
 
