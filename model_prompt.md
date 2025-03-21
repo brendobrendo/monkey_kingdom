@@ -1,159 +1,165 @@
-# Neural Network Framework to Simulate Monkey Behavior (Actor-Critic Model)
+# Neural Network Framework to Simulate Monkey Behavior  
+### (Actor-Critic Model)
 
-## Project Goal:
-Simulate decision-making in monkeys where the ultimate goal is to maximize **survival and reproductive success**, as measured through six behavioral values:
+## 🎯 Project Goal  
+Simulate decision-making in monkeys where the ultimate goal is to maximize survival and reproductive success, measured via six core behavioral values:
 
-1. **Certainty** – ensuring safety and avoiding pain  
-2. **Variety** – seeking new experiences and change  
-3. **Significance** – gaining importance, status, or uniqueness  
-4. **Connection** – building bonds with others  
-5. **Growth** – expanding knowledge and capability  
-6. **Contribution** – supporting group members  
-
----
-
-## 🧩 Architecture Overview
-
-In real terms: the **Actor** will decide *what* to do given internal and external state vectors, and the **Critic** will evaluate *how good* that action was in terms of fitness (survival and reproductive success). Based on Sutton's Actor-Critic Network.
-
-### 🔄 Shared Backbone Network (Feature Extractor)
-**Purpose**: Extracts high-level features from state inputs, which are then passed to both Actor and Critic heads.  
-**Structure**: Combines multiple modular subnetworks into a shared representation.
-
-### 🧠 Actor Model
-
-#### Input Vector (State)
-Each monkey's state is rich and high-dimensional, which makes this project interesting.
-
-**Physical state (continuous values):**
-- Strength (0-1)
-- Restedness (0-1)
-- Nourishment (0-1)
-- Hydration (0-1)
-- Internal temperature (normalized)
-
-**Beliefs about self (continuous values, perhaps [-1,1] to capture confidence/uncertainty):**
-- Independence
-- Fighting ability
-- Mate desirability
-- Cunning/outsmarting others
-- Hardship endurance
-- Curiosity
-
-**Beliefs about the group (e.g., top-N ranked peers or embeddings of peer relationships):**
-- Dominance ranks of other monkeys (maybe as a vector of 5-10 slots)
-- Group sentiment scores (ally/betrayer likelihood, respect levels, etc.)
-
-**Beliefs about role in group:**
-- Self-assessed dominance rank
-- Perceived social perception by others
-
-**Beliefs about the external world:**
-- Threat levels (predators, rivals)
-- Food/water scarcity (0-1)
-- Safety of terrain (0-1)
-- Knowledge of paths to resources (binary or probability)
-
-#### Output (Action Space)
-Discrete actions (softmaxed):
-- Groom another monkey
-- Challenge another monkey
-- Forage for food
-- Seek water
-- Explore new area
-- Flee from threat
-- Approach a group
-- Isolate/Rest
-- Mating attempt
-- Share food/resource
-- Play (for younger monkeys)
-
-### 🎯 Critic Model
-You're right about the Critic being a regression model, but let’s refine it a bit.
-
-**Goal:**  
-Output a "value function" that estimates expected cumulative reward (fitness value) based on the current state **AND** the action taken.
-
-**Inputs to Critic:**
-- Same input vector as the actor (state)
-- Chosen action (one-hot encoded)
-
-So technically, it learns **V(s,a)** — a value estimate for taking action `a` in state `s`.
-
-### Modular Subnetworks feeding into the Shared Backbone:
-
-#### **Physical State Subnetwork**
-- **Inputs**: strength, restedness, nourishment, hydration, internal temperature  
-- **Output**: Feature vector capturing internal physical readiness and needs.
-
-#### **Self-Belief Subnetwork**
-- **Inputs**: independence, fighting ability, mate desirability, cunning, endurance confidence, curiosity  
-- **Output**: Feature vector capturing self-assessment and internal beliefs.
-
-#### **Group Belief Subnetwork**
-- **Inputs**: knowledge of other monkeys’ ranks, allies, betrayers, popularity metrics  
-- **Output**: Representation of social knowledge and alliances.
-
-#### **Role Perception Subnetwork**
-- **Inputs**: self-assessed dominance rank, perceived external perception  
-- **Output**: How the monkey sees its role in the group hierarchy.
-
-#### **Environmental Belief Subnetwork**
-- **Inputs**: threat levels, food/water scarcity, terrain safety, known paths  
-- **Output**: World modeling and external environmental beliefs.
-
-👉 **All subnetwork outputs are concatenated into a shared feature vector**, processed by additional shared layers (MLP, LSTM, or Transformer block depending on task complexity).
+1. **Certainty** – Ensuring safety and avoiding pain  
+2. **Variety** – Seeking new experiences and change  
+3. **Significance** – Gaining importance, status, or uniqueness  
+4. **Connection** – Building bonds with others  
+5. **Growth** – Expanding knowledge and capability  
+6. **Contribution** – Supporting group members  
 
 ---
 
-## 🧠 Actor-Critic Head Split
+## 🧩 Architecture Overview  
+Based on Sutton’s Actor-Critic architecture, the system features:  
+- **Actor**: Chooses actions based on internal and external states.  
+- **Critic**: Evaluates how beneficial that action was for fitness (survival and reproduction).  
 
-### Shared Layers Output → Splits into:
-
-### 1️⃣ Actor Head
-- **Purpose**: Outputs action probabilities via softmax.  
-- **Inputs**: Shared feature representation  
-- **Output**: Categorical distribution over possible actions.
-
-### 2️⃣ Critic Head
-- **Purpose**: Outputs a scalar value of the action’s long-term reward.  
-- **Inputs**:
-  - Shared feature representation  
-  - Action (one-hot encoded) concatenated with shared features  
-- **Output**: Single scalar value estimating **V(s, a)**.
+### 🔄 Shared Backbone (Feature Extractor)  
+- **Purpose**: Extracts high-level features from input state vectors for use by both Actor and Critic.  
+- **Structure**: Combines modular subnetworks into a unified shared representation.  
 
 ---
 
-## 🧠 Learning Framework
-- Actor-Critic loss based on **TD-error**:
+## 🧠 Actor Model  
 
-  ![TD Error](https://latex.codecogs.com/svg.image?\delta%20=%20r%20+%20\gamma%20V(s',%20a')%20-%20V(s,%20a))
-- **Actor** updated via policy gradients.
-- **Critic** optimized via regression loss on TD-targets.
+### 🔹 Input (State Vector)  
+A high-dimensional vector representing:
 
-### 🧩 Reward Design
-Since survival & reproduction is the long-term goal, you need to define **instantaneous rewards** after each action. This is tricky and will shape learning.
+**1. Physical State (continuous values):**  
+- Strength (0-1)  
+- Restedness (0-1)  
+- Nourishment (0-1)  
+- Hydration (0-1)  
+- Internal temperature (normalized)  
 
-Use your behavioral values as dimensions of reward:
-- **Certainty:** Does the action reduce exposure to threats?
-- **Variety:** Does the action lead to new information or environments?
-- **Significance:** Does the action increase social rank or status?
-- **Connection:** Does the action improve relationships (e.g., grooming)?
-- **Growth:** Does it help learn about the world (e.g., exploration)?
-- **Contribution:** Does it increase group harmony (e.g., sharing)?
+**2. Self-Beliefs (continuous, e.g., [-1, 1] scale):**  
+- Independence  
+- Fighting ability  
+- Mate desirability  
+- Cunning/outsmarting others  
+- Hardship endurance  
+- Curiosity  
 
-These can be combined into a **weighted sum** to create a fitness proxy:
+**3. Group Beliefs:**  
+- Dominance ranks of other monkeys (vector of 5-10 slots)  
+- Group sentiment scores (ally/betrayer likelihood, respect, etc.)  
 
-```python
-Reward = w1 * Certainty + w2 * Variety + w3 * Significance + w4 * Connection + w5 * Growth + w6 * Contribution
-```
-Where w1 to w6 are tunable parameters depending on how you model "success."
+**4. Role Perception:**  
+- Self-assessed dominance rank  
+- Perceived social perception by others  
 
-### 🔄 Learning Loop
-- Actor proposes an action based on state.
-- Action executed → Environment updates.
-- Critic receives `(state, action)` and gets reward from environment.
-- Actor and Critic update based on TD-error (Temporal Difference error).
+**5. Environmental Beliefs:**  
+- Threat levels (predators, rivals)  
+- Food/water scarcity (0-1)  
+- Terrain safety (0-1)  
+- Knowledge of paths to resources (binary or probabilistic)  
+
+### 🔹 Output (Action Space)  
+Categorical distribution over discrete actions (via softmax):  
+- Groom another monkey  
+- Challenge another monkey  
+- Forage for food  
+- Seek water  
+- Explore new area  
+- Flee from threat  
+- Approach group  
+- Isolate/Rest  
+- Mating attempt  
+- Share food/resource  
+- Play (juvenile monkeys)  
+
+---
+
+## 🎯 Critic Model  
+
+### Purpose  
+Outputs a value function estimating cumulative reward (fitness proxy) based on state and action.  
+- **Learns V(s, a):** Value of taking action _a_ in state _s_.  
+
+### Inputs  
+- Same state vector as Actor  
+- Chosen action (one-hot encoded)  
+
+### Output  
+- Scalar value estimating expected long-term reward  
+
+---
+
+## 🧩 Modular Subnetworks  
+
+### 1️⃣ Physical State Subnetwork  
+- Inputs: strength, restedness, nourishment, hydration, temperature  
+- Output: Physical readiness representation  
+
+### 2️⃣ Self-Belief Subnetwork  
+- Inputs: independence, fighting ability, desirability, cunning, endurance, curiosity  
+- Output: Self-assessment representation  
+
+### 3️⃣ Group Belief Subnetwork  
+- Inputs: knowledge of ranks, allies/betrayers, social dynamics  
+- Output: Social knowledge embedding  
+
+### 4️⃣ Role Perception Subnetwork  
+- Inputs: self-dominance rank, perceived external perception  
+- Output: Hierarchical role understanding  
+
+### 5️⃣ Environmental Belief Subnetwork  
+- Inputs: threat levels, scarcity, terrain safety, resource knowledge  
+- Output: Environmental modeling  
+
+### 🧩 Subnetwork Fusion  
+- All subnetwork outputs are concatenated into a shared feature vector  
+- Processed through shared layers (MLP, LSTM, or Transformer block depending on complexity)  
+
+---
+
+## 🧠 Actor-Critic Head Split  
+
+- **Shared Features → Split into:**  
+
+### 🔹 1. Actor Head  
+- Input: Shared feature representation  
+- Output: Action probabilities (softmax)  
+
+### 🔹 2. Critic Head  
+- Input: Shared feature representation + one-hot encoded action  
+- Output: Scalar value for V(s, a)  
+
+---
+
+## 🔄 Learning Framework  
+- **Critic**: Trained via regression on TD-targets (value estimation)  
+- **Actor**: Trained via policy gradients (maximize expected rewards)  
+- **Loss**: Actor-Critic loss using TD-error (Temporal Difference error)  
+
+---
+
+## 🏆 Reward Design  
+
+Instantaneous rewards are multi-dimensional, aligned with the six behavioral values:  
+- **Certainty**: Avoid threats  
+- **Variety**: Seek new experiences  
+- **Significance**: Improve rank/status  
+- **Connection**: Build/maintain relationships  
+- **Growth**: Gain knowledge through exploration  
+- **Contribution**: Enhance group harmony  
+
+### Composite Reward Function  
+
+![Reward Formula](https://latex.codecogs.com/svg.image?Reward%20=%20w_1%20\cdot%20Certainty%20+%20w_2%20\cdot%20Variety%20+%20w_3%20\cdot%20Significance%20+%20w_4%20\cdot%20Connection%20+%20w_5%20\cdot%20Growth%20+%20w_6%20\cdot%20Contribution)
+*Where _w1 - w6_ are tunable weights for balancing the importance of each factor.*
+
+---
+
+## 🔄 Learning Loop  
+1. Actor selects an action based on the current state.  
+2. Action is executed; environment updates accordingly.  
+3. Critic evaluates the (state, action) pair and receives the reward.  
+4. Actor and Critic update parameters based on TD-error. 
 
 ---
 
